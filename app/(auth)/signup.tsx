@@ -4,14 +4,15 @@ import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function SignUpScreen() {
@@ -94,6 +95,10 @@ export default function SignUpScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLoginPress = () => {
+    router.push('/(auth)/login');
   };
 
   return (
@@ -181,6 +186,13 @@ export default function SignUpScreen() {
               loading={loading}
               style={styles.signUpButton}
             />
+
+            <View style={styles.loginContainer}>
+              <Text style={styles.loginText}>Already have an account? </Text>
+              <TouchableOpacity onPress={handleLoginPress}>
+                <Text style={styles.loginLink}>Log In</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
         </ScrollView>
@@ -232,5 +244,19 @@ const styles = StyleSheet.create({
   },
   signUpButton: {
     marginTop: 8,
+  },
+  loginContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 24,
+  },
+  loginText: {
+    fontSize: 16,
+    color: '#6B7280',
+  },
+  loginLink: {
+    fontSize: 16,
+    color: '#4F46E5',
+    fontWeight: '600',
   },
 });
