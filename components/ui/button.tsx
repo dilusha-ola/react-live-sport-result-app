@@ -1,12 +1,11 @@
 import React from 'react';
 import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  TouchableOpacityProps,
-  ViewStyle,
-  TextStyle,
+    ActivityIndicator,
+    StyleSheet,
+    Text,
+    TextStyle,
+    TouchableOpacity,
+    TouchableOpacityProps
 } from 'react-native';
 
 interface ButtonProps extends TouchableOpacityProps {

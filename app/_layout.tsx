@@ -4,8 +4,8 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AuthProvider, useAuth } from '@/context/auth-context';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export const unstable_settings = {
   // Don't set initial route here, we'll handle it in the navigation guard

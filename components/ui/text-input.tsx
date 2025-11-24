@@ -1,10 +1,10 @@
 import React from 'react';
 import {
-  TextInput as RNTextInput,
-  StyleSheet,
-  View,
-  Text,
-  TextInputProps,
+    TextInput as RNTextInput,
+    StyleSheet,
+    Text,
+    TextInputProps,
+    View,
 } from 'react-native';
 
 interface CustomTextInputProps extends TextInputProps {
