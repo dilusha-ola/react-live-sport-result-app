@@ -2,16 +2,14 @@ import { TopBar } from '@/components/navigation/top-bar';
 import React from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-export default function HomeScreen() {
+export default function SearchScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <TopBar />
-      <ScrollView style={styles.container}>
-        <View style={styles.content}>
-          <View style={styles.placeholder}>
-            <Text style={styles.title}>Welcome to ScorePulse!</Text>
-            <Text style={styles.subtitle}>Live sports scores and updates</Text>
-          </View>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <View style={styles.placeholder}>
+          <Text style={styles.title}>Search</Text>
+          <Text style={styles.subtitle}>Search for teams, players, and matches</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -27,18 +25,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
   },
   placeholder: {
     alignItems: 'center',
-    paddingTop: 60,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
     color: '#1F2937',
     marginBottom: 8,
-    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
@@ -46,4 +45,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-
