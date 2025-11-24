@@ -88,14 +88,28 @@ class SportsService {
       const eventsArrays = await Promise.all(eventsPromises);
       const allEvents = eventsArrays.flat();
 
+      console.log(`Total events fetched for ${sport}:`, allEvents.length);
+
       // Filter for today's matches (consider them "live")
       const today = new Date().toISOString().split('T')[0];
       const todayMatches = allEvents.filter(event => {
-        if (!event.dateEvent) return false;
-        return event.dateEvent === today && event.strSport === sport;
+        if (!event || !event.dateEvent) return false;
+        return event.dateEvent === today;
       });
 
-      console.log(`Found ${todayMatches.length} live ${sport} matches`);
+      console.log(`Found ${todayMatches.length} live ${sport} matches for today (${today})`);
+      
+      // If no matches today, return recent matches from past 3 days as "live"
+      if (todayMatches.length === 0) {
+        const threeDaysAgo = new Date(Date.now() - 3 * 86400000).toISOString().split('T')[0];
+        const recentMatches = allEvents.filter(event => {
+          if (!event || !event.dateEvent) return false;
+          return event.dateEvent >= threeDaysAgo;
+        }).slice(0, 10);
+        console.log(`No matches today, showing ${recentMatches.length} recent matches`);
+        return recentMatches;
+      }
+      
       return todayMatches.slice(0, 10);
     } catch (error) {
       console.error('Error fetching live scores:', error);
@@ -119,12 +133,14 @@ class SportsService {
       const eventsArrays = await Promise.all(eventsPromises);
       const allEvents = eventsArrays.flat();
 
+      console.log(`Total upcoming events fetched for ${sport}:`, allEvents.length);
+
       // Filter for future events
       const now = new Date();
       const upcomingMatches = allEvents.filter(event => {
-        if (!event.dateEvent) return false;
+        if (!event || !event.dateEvent) return false;
         const eventDate = new Date(event.dateEvent);
-        return eventDate > now && event.strSport === sport;
+        return eventDate > now;
       });
 
       console.log(`Found ${upcomingMatches.length} upcoming ${sport} matches`);
@@ -151,9 +167,11 @@ class SportsService {
       const eventsArrays = await Promise.all(eventsPromises);
       const allEvents = eventsArrays.flat();
 
+      console.log(`Total past events fetched for ${sport}:`, allEvents.length);
+
       // Filter and sort by most recent
       const recentMatches = allEvents
-        .filter(event => event.strSport === sport && event.dateEvent)
+        .filter(event => event && event.dateEvent)
         .sort((a, b) => {
           const dateA = new Date(a.dateEvent || 0);
           const dateB = new Date(b.dateEvent || 0);

@@ -42,7 +42,7 @@ export function RecentMatchCard({ match, onPress, onFavoritePress, isFavorite = 
           {/* Recent badge and favorite */}
           <View style={styles.header}>
             <View style={styles.recentBadge}>
-              <Text style={styles.recentText}>FINAL</Text>
+              <Text style={styles.recentText}>Recent</Text>
             </View>
             <TouchableOpacity onPress={onFavoritePress} style={styles.favoriteButton}>
               <Ionicons 

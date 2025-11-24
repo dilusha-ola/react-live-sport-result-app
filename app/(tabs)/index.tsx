@@ -2,7 +2,7 @@ import { LiveMatchCard } from '@/components/matches/live-match-card';
 import { RecentMatchCard } from '@/components/matches/recent-match-card';
 import { UpcomingMatchCard } from '@/components/matches/upcoming-match-card';
 import { TopBar } from '@/components/navigation/top-bar';
-import { sportsService } from '@/services/sports.service';
+import { sportsService } from '../../services/sports.service';
 import { Event, MatchStatus, SportCategory } from '@/types/sports';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
