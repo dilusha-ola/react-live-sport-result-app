@@ -1,8 +1,23 @@
-# Welcome to your Expo app 👋
+# ScorePulse - Live Sports App 🏆
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native mobile application for viewing live sports matches, teams, and players. Built with Expo, TypeScript, and TheSportsDB API.
 
-## Get started
+## Features
+
+- 🏅 View live sports matches and scores
+- 👥 Browse teams and player information
+- 🔐 User authentication with dummy API
+- 📱 Cross-platform support (iOS, Android, Web)
+- 🎨 Modern UI with best practices
+
+## Tech Stack
+
+- **Framework**: React Native with Expo
+- **Language**: TypeScript
+- **API**: TheSportsDB (https://www.thesportsdb.com/api.php)
+- **Authentication**: DummyJSON API (https://dummyjson.com/docs)
+
+## Get Started
 
 1. Install dependencies
 
@@ -16,35 +31,41 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+In the output, you'll find options to open the app in a:
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
+- [Development build](https://docs.expo.dev/develop/development-builds/introduction/)
 - [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- [Expo Go](https://expo.dev/go)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Project Structure
 
-## Get a fresh project
+This project uses [file-based routing](https://docs.expo.dev/router/introduction) with the **app** directory.
 
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+app/                    # Main application directory
+  (tabs)/              # Tab-based navigation
+  _layout.tsx          # Root layout
+components/            # Reusable components
+  ui/                  # UI components
+constants/             # App constants and themes
+hooks/                 # Custom React hooks
+assets/                # Images and other assets
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Development Guidelines
 
-## Learn more
+- **Feature-based commits**: Make commits related to specific features
+- **Proper validations**: Implement appropriate input validations
+- **Decoupled code**: Structure code to be modular and easy to test
+- **Best Practices**: Adhere to React Native and TypeScript best practices
 
-To learn more about developing your project with Expo, look at the following resources:
+## Learn More
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- [Expo documentation](https://docs.expo.dev/)
+- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/)
+- [TheSportsDB API Documentation](https://www.thesportsdb.com/api.php)
 
-## Join the community
+## License
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+This project is for educational purposes.
