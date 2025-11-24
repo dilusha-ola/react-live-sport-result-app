@@ -189,11 +189,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#000000',
     marginBottom: 12,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
     color: '#6B7280',
     lineHeight: 24,
+    textAlign: 'center',
   },
   form: {
     flex: 1,
