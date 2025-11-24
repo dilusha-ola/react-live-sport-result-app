@@ -1,153 +1,167 @@
-import { Event, EventsResponse, League, LeaguesResponse, Sport, SportsResponse } from '@/types/sports';
+import { Event, EventsResponse, League, LeaguesResponse } from '@/types/sports';
 
 const BASE_URL = 'https://www.thesportsdb.com/api/v1/json/3';
 
-class SportsService {
-  // Get all sports
-  async getAllSports(): Promise<Sport[]> {
-    try {
-      const response = await fetch(`${BASE_URL}/all_sports.php`);
-      const data: SportsResponse = await response.json();
-      return data.sports || [];
-    } catch (error) {
-      console.error('Error fetching sports:', error);
-      throw new Error('Failed to fetch sports');
-    }
-  }
+// Major league IDs for each sport from TheSportsDB
+const SPORT_LEAGUES = {
+  Soccer: [
+    '4328', // English Premier League
+    '4335', // Spanish La Liga
+    '4331', // German Bundesliga
+    '4332', // Italian Serie A
+    '4334', // French Ligue 1
+  ],
+  Cricket: [
+    '4420', // International Cricket
+    '4421', // IPL
+    '4422', // Big Bash League
+  ],
+  Rugby: [
+    '4391', // Super Rugby
+    '4392', // Six Nations
+    '4393', // Rugby Championship
+  ],
+};
 
-  // Get all leagues for a specific sport
-  async getLeaguesBySport(sport: string): Promise<League[]> {
+class SportsService {
+  // Get leagues for a specific sport
+  private async getLeaguesBySport(sport: string): Promise<League[]> {
     try {
       const response = await fetch(`${BASE_URL}/search_all_leagues.php?s=${encodeURIComponent(sport)}`);
       const data: LeaguesResponse = await response.json();
       return data.leagues || [];
     } catch (error) {
       console.error('Error fetching leagues:', error);
-      throw new Error('Failed to fetch leagues');
+      return [];
     }
   }
 
-  // Get events for the next 15 days from a specific league
-  async getNext15Events(leagueId: string): Promise<Event[]> {
+  // Get upcoming events for a specific league
+  private async getNext15Events(leagueId: string): Promise<Event[]> {
     try {
       const response = await fetch(`${BASE_URL}/eventsnextleague.php?id=${leagueId}`);
       const data: EventsResponse = await response.json();
       return data.events || [];
     } catch (error) {
-      console.error('Error fetching next events:', error);
+      console.error(`Error fetching next events for league ${leagueId}:`, error);
       return [];
     }
   }
 
-  // Get past events from a specific league
-  async getPastEvents(leagueId: string): Promise<Event[]> {
+  // Get past events for a specific league
+  private async getPastEvents(leagueId: string): Promise<Event[]> {
     try {
       const response = await fetch(`${BASE_URL}/eventspastleague.php?id=${leagueId}`);
       const data: EventsResponse = await response.json();
       return data.events || [];
     } catch (error) {
-      console.error('Error fetching past events:', error);
+      console.error(`Error fetching past events for league ${leagueId}:`, error);
       return [];
     }
   }
 
-  // Get events for a specific date and sport (for live/today's matches)
-  async getEventsByDateAndSport(date: string, sport: string): Promise<Event[]> {
+  // Get all sports
+  async getAllSports() {
     try {
-      const response = await fetch(`${BASE_URL}/eventsday.php?d=${date}&s=${encodeURIComponent(sport)}`);
-      const data: EventsResponse = await response.json();
-      return data.events || [];
+      const response = await fetch(`${BASE_URL}/all_sports.php`);
+      const data = await response.json();
+      return data.sports || [];
     } catch (error) {
-      console.error('Error fetching events by date:', error);
+      console.error('Error fetching all sports:', error);
       return [];
     }
   }
 
-  // Get live scores (simulated - TheSportsDB free tier doesn't have real-time live scores)
+  // Get live scores (using past events from today)
   async getLiveScores(sport: string): Promise<Event[]> {
     try {
-      // Using today's date to get matches that might be "live"
-      const today = new Date().toISOString().split('T')[0];
-      const events = await this.getEventsByDateAndSport(today, sport);
+      console.log(`Fetching live ${sport} matches...`);
       
-      // Filter to ensure correct sport
-      const filtered = events.filter(event => event.strSport === sport);
-      console.log(`Live ${sport} matches:`, filtered.length);
-      return filtered;
+      const leagueIds = SPORT_LEAGUES[sport as keyof typeof SPORT_LEAGUES] || [];
+      if (leagueIds.length === 0) {
+        console.log(`No leagues configured for ${sport}`);
+        return [];
+      }
+
+      // Fetch past events from all leagues for this sport
+      const eventsPromises = leagueIds.map(leagueId => this.getPastEvents(leagueId));
+      const eventsArrays = await Promise.all(eventsPromises);
+      const allEvents = eventsArrays.flat();
+
+      // Filter for today's matches (consider them "live")
+      const today = new Date().toISOString().split('T')[0];
+      const todayMatches = allEvents.filter(event => {
+        if (!event.dateEvent) return false;
+        return event.dateEvent === today && event.strSport === sport;
+      });
+
+      console.log(`Found ${todayMatches.length} live ${sport} matches`);
+      return todayMatches.slice(0, 10);
     } catch (error) {
       console.error('Error fetching live scores:', error);
       return [];
     }
   }
 
-  // Get upcoming matches for a sport
+  // Get upcoming matches
   async getUpcomingMatches(sport: string): Promise<Event[]> {
     try {
-      // Get major leagues for the sport and fetch upcoming events
-      const leagues = await this.getLeaguesBySport(sport);
-      if (!leagues || leagues.length === 0) {
-        console.log(`No leagues found for sport: ${sport}`);
+      console.log(`Fetching upcoming ${sport} matches...`);
+      
+      const leagueIds = SPORT_LEAGUES[sport as keyof typeof SPORT_LEAGUES] || [];
+      if (leagueIds.length === 0) {
+        console.log(`No leagues configured for ${sport}`);
         return [];
       }
-      
-      const majorLeagues = leagues.filter(l => l.strSport === sport).slice(0, 5);
-      console.log(`Found ${majorLeagues.length} leagues for ${sport}`);
-      
-      const eventsPromises = majorLeagues.map(league => 
-        this.getNext15Events(league.idLeague)
-      );
-      
+
+      // Fetch upcoming events from all leagues for this sport
+      const eventsPromises = leagueIds.map(leagueId => this.getNext15Events(leagueId));
       const eventsArrays = await Promise.all(eventsPromises);
       const allEvents = eventsArrays.flat();
-      
-      // Filter for future events only and ensure they match the sport
+
+      // Filter for future events
       const now = new Date();
-      const filtered = allEvents.filter(event => {
+      const upcomingMatches = allEvents.filter(event => {
         if (!event.dateEvent) return false;
         const eventDate = new Date(event.dateEvent);
         return eventDate > now && event.strSport === sport;
-      }).slice(0, 10);
-      
-      console.log(`Upcoming ${sport} matches:`, filtered.length);
-      return filtered;
+      });
+
+      console.log(`Found ${upcomingMatches.length} upcoming ${sport} matches`);
+      return upcomingMatches.slice(0, 10);
     } catch (error) {
       console.error('Error fetching upcoming matches:', error);
       return [];
     }
   }
 
-  // Get recent matches for a sport
+  // Get recent/past matches
   async getRecentMatches(sport: string): Promise<Event[]> {
     try {
-      // Get major leagues for the sport and fetch past events
-      const leagues = await this.getLeaguesBySport(sport);
-      if (!leagues || leagues.length === 0) {
-        console.log(`No leagues found for sport: ${sport}`);
+      console.log(`Fetching recent ${sport} matches...`);
+      
+      const leagueIds = SPORT_LEAGUES[sport as keyof typeof SPORT_LEAGUES] || [];
+      if (leagueIds.length === 0) {
+        console.log(`No leagues configured for ${sport}`);
         return [];
       }
-      
-      const majorLeagues = leagues.filter(l => l.strSport === sport).slice(0, 5);
-      console.log(`Found ${majorLeagues.length} leagues for ${sport}`);
-      
-      const eventsPromises = majorLeagues.map(league => 
-        this.getPastEvents(league.idLeague)
-      );
-      
+
+      // Fetch past events from all leagues for this sport
+      const eventsPromises = leagueIds.map(leagueId => this.getPastEvents(leagueId));
       const eventsArrays = await Promise.all(eventsPromises);
       const allEvents = eventsArrays.flat();
-      
-      // Filter to ensure correct sport and sort by date (most recent first)
-      const filtered = allEvents
-        .filter(event => event.strSport === sport)
+
+      // Filter and sort by most recent
+      const recentMatches = allEvents
+        .filter(event => event.strSport === sport && event.dateEvent)
         .sort((a, b) => {
           const dateA = new Date(a.dateEvent || 0);
           const dateB = new Date(b.dateEvent || 0);
           return dateB.getTime() - dateA.getTime();
-        })
-        .slice(0, 10);
-      
-      console.log(`Recent ${sport} matches:`, filtered.length);
-      return filtered;
+        });
+
+      console.log(`Found ${recentMatches.length} recent ${sport} matches`);
+      return recentMatches.slice(0, 10);
     } catch (error) {
       console.error('Error fetching recent matches:', error);
       return [];
@@ -156,3 +170,4 @@ class SportsService {
 }
 
 export const sportsService = new SportsService();
+
