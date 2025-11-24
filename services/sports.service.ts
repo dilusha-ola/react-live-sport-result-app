@@ -1,6 +1,8 @@
+import { MOCK_DATA } from '@/data/mock-matches';
 import { Event, EventsResponse, League, LeaguesResponse } from '@/types/sports';
 
 const BASE_URL = 'https://www.thesportsdb.com/api/v1/json/3';
+const USE_MOCK_DATA = true; // Set to false to use real API
 
 // Sport name mappings for TheSportsDB API
 const SPORT_NAMES = {
@@ -102,6 +104,14 @@ class SportsService {
 
   // Get live scores (using past events from today)
   async getLiveScores(sport: string): Promise<Event[]> {
+    // Use mock data if enabled
+    if (USE_MOCK_DATA) {
+      console.log(`Loading mock live ${sport} matches...`);
+      const data = MOCK_DATA[sport as keyof typeof MOCK_DATA]?.live || [];
+      console.log(`Returning ${data.length} live matches for ${sport}`);
+      return data;
+    }
+
     try {
       console.log(`Fetching live ${sport} matches...`);
       
@@ -165,6 +175,14 @@ class SportsService {
 
   // Get upcoming matches
   async getUpcomingMatches(sport: string): Promise<Event[]> {
+    // Use mock data if enabled
+    if (USE_MOCK_DATA) {
+      console.log(`Loading mock upcoming ${sport} matches...`);
+      const data = MOCK_DATA[sport as keyof typeof MOCK_DATA]?.upcoming || [];
+      console.log(`Returning ${data.length} upcoming matches for ${sport}`);
+      return data;
+    }
+
     try {
       console.log(`Fetching upcoming ${sport} matches...`);
       
@@ -216,6 +234,14 @@ class SportsService {
 
   // Get recent/past matches
   async getRecentMatches(sport: string): Promise<Event[]> {
+    // Use mock data if enabled
+    if (USE_MOCK_DATA) {
+      console.log(`Loading mock recent ${sport} matches...`);
+      const data = MOCK_DATA[sport as keyof typeof MOCK_DATA]?.recent || [];
+      console.log(`Returning ${data.length} recent matches for ${sport}`);
+      return data;
+    }
+
     try {
       console.log(`Fetching recent ${sport} matches...`);
       
