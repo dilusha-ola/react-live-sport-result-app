@@ -1,11 +1,18 @@
 import { TopBar } from '@/components/navigation/top-bar';
 import { useAuth } from '@/context/auth-context';
+import { useFavorites } from '@/context/favorites-context';
+import { useTheme } from '@/context/theme-context';
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { Alert, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState } from 'react';
+import { Alert, SafeAreaView, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 
 export default function SettingsScreen() {
   const { logout, user } = useAuth();
+  const { favorites } = useFavorites();
+  const { isDarkMode, toggleDarkMode } = useTheme();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [liveScoreAlerts, setLiveScoreAlerts] = useState(true);
 
   const handleLogout = () => {
     Alert.alert(
@@ -27,11 +34,63 @@ export default function SettingsScreen() {
     );
   };
 
+  const handleClearCache = () => {
+    Alert.alert(
+      'Clear Cache',
+      'This will clear all cached data. Are you sure?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Clear',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              // Clear specific cache items (not favorites)
+              await AsyncStorage.multiRemove(['@scorepulse_cache', '@scorepulse_settings']);
+              Alert.alert('Success', 'Cache cleared successfully');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to clear cache');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleClearFavorites = () => {
+    Alert.alert(
+      'Clear All Favorites',
+      `This will remove all ${favorites.length} favorite matches. Are you sure?`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Clear',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await AsyncStorage.removeItem('@scorepulse_favorites');
+              Alert.alert('Success', 'All favorites have been cleared');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to clear favorites');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <TopBar />
       <ScrollView style={styles.container}>
         <View style={styles.content}>
+          {/* Account Section */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Account</Text>
             
@@ -56,26 +115,110 @@ export default function SettingsScreen() {
             </View>
           </View>
 
+          {/* Preferences Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>General</Text>
+            <Text style={styles.sectionTitle}>Preferences</Text>
             
-            <TouchableOpacity style={styles.settingItem}>
+            <View style={styles.settingItem}>
               <View style={styles.settingLeft}>
                 <Ionicons name="notifications-outline" size={24} color="#6B7280" />
-                <Text style={styles.settingLabel}>Notifications</Text>
+                <Text style={styles.settingLabel}>Push Notifications</Text>
               </View>
-              <Ionicons name="chevron-forward" size={24} color="#9CA3AF" />
-            </TouchableOpacity>
+              <Switch
+                value={notificationsEnabled}
+                onValueChange={setNotificationsEnabled}
+                trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
+                thumbColor={notificationsEnabled ? '#4F46E5' : '#F3F4F6'}
+              />
+            </View>
 
-            <TouchableOpacity style={styles.settingItem}>
+            <View style={styles.settingItem}>
+              <View style={styles.settingLeft}>
+                <Ionicons name="flash-outline" size={24} color="#6B7280" />
+                <Text style={styles.settingLabel}>Live Score Alerts</Text>
+              </View>
+              <Switch
+                value={liveScoreAlerts}
+                onValueChange={setLiveScoreAlerts}
+                trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
+                thumbColor={liveScoreAlerts ? '#4F46E5' : '#F3F4F6'}
+              />
+            </View>
+
+            <View style={styles.settingItem}>
               <View style={styles.settingLeft}>
                 <Ionicons name="moon-outline" size={24} color="#6B7280" />
                 <Text style={styles.settingLabel}>Dark Mode</Text>
+              </View>
+              <Switch
+                value={isDarkMode}
+                onValueChange={toggleDarkMode}
+                trackColor={{ false: '#D1D5DB', true: '#818CF8' }}
+                thumbColor={isDarkMode ? '#4F46E5' : '#F3F4F6'}
+              />
+            </View>
+          </View>
+
+          {/* Data & Storage Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Data & Storage</Text>
+            
+            <View style={styles.settingItem}>
+              <View style={styles.settingLeft}>
+                <Ionicons name="star-outline" size={24} color="#6B7280" />
+                <View style={styles.settingText}>
+                  <Text style={styles.settingLabel}>Favorite Matches</Text>
+                  <Text style={styles.settingValue}>{favorites.length} saved</Text>
+                </View>
+              </View>
+              {favorites.length > 0 && (
+                <TouchableOpacity onPress={handleClearFavorites}>
+                  <Text style={styles.actionText}>Clear</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <TouchableOpacity style={styles.settingItem} onPress={handleClearCache}>
+              <View style={styles.settingLeft}>
+                <Ionicons name="trash-outline" size={24} color="#6B7280" />
+                <Text style={styles.settingLabel}>Clear Cache</Text>
               </View>
               <Ionicons name="chevron-forward" size={24} color="#9CA3AF" />
             </TouchableOpacity>
           </View>
 
+          {/* About Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>About</Text>
+            
+            <View style={styles.settingItem}>
+              <View style={styles.settingLeft}>
+                <Ionicons name="information-circle-outline" size={24} color="#6B7280" />
+                <View style={styles.settingText}>
+                  <Text style={styles.settingLabel}>Version</Text>
+                  <Text style={styles.settingValue}>1.0.0</Text>
+                </View>
+              </View>
+            </View>
+
+            <TouchableOpacity style={styles.settingItem}>
+              <View style={styles.settingLeft}>
+                <Ionicons name="document-text-outline" size={24} color="#6B7280" />
+                <Text style={styles.settingLabel}>Privacy Policy</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={24} color="#9CA3AF" />
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.settingItem}>
+              <View style={styles.settingLeft}>
+                <Ionicons name="shield-checkmark-outline" size={24} color="#6B7280" />
+                <Text style={styles.settingLabel}>Terms of Service</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={24} color="#9CA3AF" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Logout Button */}
           <View style={styles.section}>
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
               <Ionicons name="log-out-outline" size={24} color="#EF4444" />
@@ -134,6 +277,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6B7280',
     marginTop: 2,
+  },
+  actionText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#4F46E5',
   },
   logoutButton: {
     flexDirection: 'row',

@@ -6,6 +6,7 @@ import 'react-native-reanimated';
 
 import { AuthProvider, useAuth } from '@/context/auth-context';
 import { FavoritesProvider } from '@/context/favorites-context';
+import { ThemeProvider as AppThemeProvider, useTheme } from '@/context/theme-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export const unstable_settings = {
@@ -14,6 +15,7 @@ export const unstable_settings = {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const { isDarkMode } = useTheme();
   const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
@@ -25,21 +27,26 @@ function RootLayoutNav() {
 
     if (!isAuthenticated && !inAuthGroup) {
       // Redirect to login if not authenticated
-      router.replace('/(auth)/login');
+      setTimeout(() => {
+        router.replace('/(auth)/login');
+      }, 100);
     } else if (isAuthenticated && inAuthGroup) {
       // Redirect to app if authenticated
-      router.replace('/(tabs)');
+      setTimeout(() => {
+        router.replace('/(tabs)');
+      }, 100);
     }
   }, [isAuthenticated, segments, isLoading]);
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={isDarkMode ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+        <Stack.Screen name="match-details" options={{ headerShown: false }} />
       </Stack>
-      <StatusBar style="auto" />
+      <StatusBar style={isDarkMode ? 'light' : 'dark'} />
     </ThemeProvider>
   );
 }
@@ -47,9 +54,11 @@ function RootLayoutNav() {
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <FavoritesProvider>
-        <RootLayoutNav />
-      </FavoritesProvider>
+      <AppThemeProvider>
+        <FavoritesProvider>
+          <RootLayoutNav />
+        </FavoritesProvider>
+      </AppThemeProvider>
     </AuthProvider>
   );
 }

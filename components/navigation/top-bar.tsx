@@ -6,9 +6,21 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 export function TopBar() {
   const { user } = useAuth();
 
-  const displayName = user?.firstName 
-    ? `${user.firstName}${user.lastName ? user.lastName.charAt(0) : ''}`
-    : user?.username || 'Guest';
+  const getDisplayName = () => {
+    if (user?.firstName && user?.lastName) {
+      // If we have both first and last name, show full name
+      return `${user.firstName} ${user.lastName}`;
+    }
+    if (user?.firstName) {
+      return user.firstName;
+    }
+    if (user?.username) {
+      return user.username;
+    }
+    return 'dilap';
+  };
+
+  const displayName = getDisplayName();
 
   return (
     <View style={styles.container}>
