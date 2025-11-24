@@ -2,6 +2,7 @@ import { authService } from '@/services/auth.service';
 import { LoginCredentials, SignUpData, User } from '@/types/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { Alert } from 'react-native';
 
 interface AuthContextType {
   user: User | null;
@@ -79,11 +80,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
+    console.log('Logout function called');
     try {
+      // Clear auth data and update state
       await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
+      console.log('Auth storage removed');
       setUser(null);
+      console.log('User set to null');
     } catch (error) {
       console.error('Failed to logout:', error);
+      Alert.alert(
+        'Error',
+        'Failed to logout. Please try again.'
+      );
+      throw error;
     }
   };
 

@@ -4,6 +4,7 @@ import { useFavorites } from '@/context/favorites-context';
 import { useTheme } from '@/context/theme-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, SafeAreaView, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 
@@ -11,27 +12,32 @@ export default function SettingsScreen() {
   const { logout, user } = useAuth();
   const { favorites } = useFavorites();
   const { isDarkMode, toggleDarkMode } = useTheme();
+  const router = useRouter();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [liveScoreAlerts, setLiveScoreAlerts] = useState(true);
 
-  const handleLogout = () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: async () => {
-            await logout();
-          },
-        },
-      ]
-    );
+  const handleLogout = async () => {
+    console.log('Handle logout called');
+    
+    // Use window.confirm for web compatibility
+    const confirmed = window.confirm('Are you sure you want to logout?');
+    console.log('Confirmation result:', confirmed);
+    
+    if (!confirmed) {
+      console.log('Logout cancelled');
+      return;
+    }
+    
+    console.log('Logout confirmed');
+    try {
+      await logout();
+      console.log('Logout completed, navigating to login...');
+      router.replace('/(auth)/login');
+      alert('You have been logged out successfully.');
+    } catch (error) {
+      console.error('Logout error:', error);
+      alert('Failed to logout. Please try again.');
+    }
   };
 
   const handleClearCache = () => {
