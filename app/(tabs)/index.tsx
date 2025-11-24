@@ -2,7 +2,7 @@ import { LiveMatchCard } from '@/components/matches/live-match-card';
 import { RecentMatchCard } from '@/components/matches/recent-match-card';
 import { UpcomingMatchCard } from '@/components/matches/upcoming-match-card';
 import { TopBar } from '@/components/navigation/top-bar';
-import { sportsService } from '../../services/sports.service';
+import { useFavorites } from '@/context/favorites-context';
 import { Event, MatchStatus, SportCategory } from '@/types/sports';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -16,6 +16,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { sportsService } from '../../services/sports.service';
 
 const MATCH_TABS: { key: MatchStatus; label: string }[] = [
   { key: 'live', label: 'LIVE' },
@@ -31,11 +32,11 @@ const SPORT_CATEGORIES: { key: SportCategory; label: string; icon: string }[] = 
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { toggleFavorite, isFavorite } = useFavorites();
   const [activeTab, setActiveTab] = useState<MatchStatus>('live');
   const [activeSport, setActiveSport] = useState<SportCategory>('Soccer');
   const [matches, setMatches] = useState<Event[]>([]);
   const [loading, setLoading] = useState(false);
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     loadMatches();
@@ -59,7 +60,8 @@ export default function HomeScreen() {
           break;
       }
       
-      console.log(`Loaded ${data.length} matches for ${activeSport}`);
+      console.log(`Loaded ${data.length} ${activeTab} matches for ${activeSport}:`, 
+        data.map(m => m.strEvent).join(', '));
       setMatches(data);
     } catch (error) {
       console.error('Error loading matches:', error);
@@ -69,36 +71,24 @@ export default function HomeScreen() {
     }
   };
 
-  const toggleFavorite = (matchId: string) => {
-    setFavorites(prev => {
-      const newFavorites = new Set(prev);
-      if (newFavorites.has(matchId)) {
-        newFavorites.delete(matchId);
-      } else {
-        newFavorites.add(matchId);
-      }
-      return newFavorites;
-    });
-  };
-
   const handleMatchPress = (match: Event) => {
     router.push({
-      pathname: '/match-details',
+      pathname: '/match-details' as any,
       params: { match: JSON.stringify(match) },
     });
   };
 
   const renderMatchCard = (match: Event) => {
-    const isFavorite = favorites.has(match.idEvent);
+    const isMatchFavorite = isFavorite(match.idEvent);
     
     if (activeTab === 'live') {
       return (
         <LiveMatchCard
           key={match.idEvent}
           match={match}
-          isFavorite={isFavorite}
+          isFavorite={isMatchFavorite}
           onPress={() => handleMatchPress(match)}
-          onFavoritePress={() => toggleFavorite(match.idEvent)}
+          onFavoritePress={() => toggleFavorite(match)}
         />
       );
     } else if (activeTab === 'recent') {
@@ -106,9 +96,9 @@ export default function HomeScreen() {
         <RecentMatchCard
           key={match.idEvent}
           match={match}
-          isFavorite={isFavorite}
+          isFavorite={isMatchFavorite}
           onPress={() => handleMatchPress(match)}
-          onFavoritePress={() => toggleFavorite(match.idEvent)}
+          onFavoritePress={() => toggleFavorite(match)}
         />
       );
     } else {
@@ -116,9 +106,9 @@ export default function HomeScreen() {
         <UpcomingMatchCard
           key={match.idEvent}
           match={match}
-          isFavorite={isFavorite}
+          isFavorite={isMatchFavorite}
           onPress={() => handleMatchPress(match)}
-          onFavoritePress={() => toggleFavorite(match.idEvent)}
+          onFavoritePress={() => toggleFavorite(match)}
         />
       );
     }
