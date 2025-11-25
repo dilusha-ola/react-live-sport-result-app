@@ -3,6 +3,7 @@ import { RecentMatchCard } from '@/components/matches/recent-match-card';
 import { UpcomingMatchCard } from '@/components/matches/upcoming-match-card';
 import { TopBar } from '@/components/navigation/top-bar';
 import { useFavorites } from '@/context/favorites-context';
+import { useTheme } from '@/context/theme-context';
 import { Event, MatchStatus, SportCategory } from '@/types/sports';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -33,10 +34,13 @@ const SPORT_CATEGORIES: { key: SportCategory; label: string; icon: string }[] = 
 export default function HomeScreen() {
   const router = useRouter();
   const { toggleFavorite, isFavorite } = useFavorites();
+  const { isDarkMode } = useTheme();
   const [activeTab, setActiveTab] = useState<MatchStatus>('live');
   const [activeSport, setActiveSport] = useState<SportCategory>('Soccer');
   const [matches, setMatches] = useState<Event[]>([]);
   const [loading, setLoading] = useState(false);
+  
+  const styles = getStyles(isDarkMode);
 
   useEffect(() => {
     loadMatches();
@@ -160,7 +164,7 @@ export default function HomeScreen() {
               <Ionicons
                 name={sport.icon as any}
                 size={20}
-                color={activeSport === sport.key ? '#FFFFFF' : '#6B7280'}
+                color={activeSport === sport.key ? '#FFFFFF' : (isDarkMode ? '#9CA3AF' : '#6B7280')}
               />
               <Text
                 style={[
@@ -188,12 +192,12 @@ export default function HomeScreen() {
 
           {loading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#4F46E5" />
+              <ActivityIndicator size="large" color={isDarkMode ? '#818CF8' : '#4F46E5'} />
               <Text style={styles.loadingText}>Loading matches...</Text>
             </View>
           ) : matches.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Ionicons name="calendar-outline" size={48} color="#D1D5DB" />
+              <Ionicons name="calendar-outline" size={48} color={isDarkMode ? '#475569' : '#D1D5DB'} />
               <Text style={styles.emptyText}>No matches found</Text>
               <Text style={styles.emptySubtext}>
                 Check back later for updates
@@ -210,23 +214,23 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (isDarkMode: boolean) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: isDarkMode ? '#1E293B' : '#FFFFFF',
   },
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: isDarkMode ? '#0F172A' : '#F9FAFB',
   },
   content: {
     padding: 16,
   },
   mainTabsContainer: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: isDarkMode ? '#1E293B' : '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: isDarkMode ? '#334155' : '#E5E7EB',
     paddingHorizontal: 16,
   },
   mainTab: {
@@ -237,20 +241,20 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   mainTabActive: {
-    borderBottomColor: '#4F46E5',
+    borderBottomColor: isDarkMode ? '#818CF8' : '#4F46E5',
   },
   mainTabText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#9CA3AF',
+    color: isDarkMode ? '#64748B' : '#9CA3AF',
   },
   mainTabTextActive: {
-    color: '#4F46E5',
+    color: isDarkMode ? '#818CF8' : '#4F46E5',
   },
   sportFiltersContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: isDarkMode ? '#1E293B' : '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: isDarkMode ? '#334155' : '#E5E7EB',
     paddingVertical: 12,
   },
   sportFiltersContent: {
@@ -264,18 +268,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 24,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: isDarkMode ? '#334155' : '#F3F4F6',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: isDarkMode ? '#475569' : '#E5E7EB',
   },
   sportFilterActive: {
-    backgroundColor: '#4F46E5',
-    borderColor: '#4F46E5',
+    backgroundColor: isDarkMode ? '#4F46E5' : '#4F46E5',
+    borderColor: isDarkMode ? '#4F46E5' : '#4F46E5',
   },
   sportFilterText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6B7280',
+    color: isDarkMode ? '#CBD5E1' : '#6B7280',
   },
   sportFilterTextActive: {
     color: '#FFFFFF',
@@ -286,7 +290,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1F2937',
+    color: isDarkMode ? '#F1F5F9' : '#1F2937',
   },
   matchesList: {
     paddingBottom: 20,
@@ -299,7 +303,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#6B7280',
+    color: isDarkMode ? '#94A3B8' : '#6B7280',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -310,12 +314,12 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 18,
     fontWeight: '600',
-    color: '#6B7280',
+    color: isDarkMode ? '#94A3B8' : '#6B7280',
   },
   emptySubtext: {
     marginTop: 4,
     fontSize: 14,
-    color: '#9CA3AF',
+    color: isDarkMode ? '#64748B' : '#9CA3AF',
   },
 });
 

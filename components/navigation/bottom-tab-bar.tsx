@@ -1,3 +1,4 @@
+import { useTheme } from '@/context/theme-context';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import React from 'react';
@@ -40,6 +41,9 @@ const TAB_CONFIGS: Record<string, TabConfig> = {
 };
 
 export function BottomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+  const { isDarkMode } = useTheme();
+  const styles = getStyles(isDarkMode);
+  
   return (
     <View style={styles.container}>
       <View style={styles.tabBar}>
@@ -80,12 +84,12 @@ export function BottomTabBar({ state, descriptors, navigation }: BottomTabBarPro
               <Ionicons
                 name={isFocused ? config.icon : config.iconOutline}
                 size={24}
-                color={isFocused ? '#4F46E5' : '#9CA3AF'}
+                color={isFocused ? (isDarkMode ? '#818CF8' : '#4F46E5') : (isDarkMode ? '#6B7280' : '#9CA3AF')}
               />
               <Text
                 style={[
                   styles.label,
-                  { color: isFocused ? '#4F46E5' : '#9CA3AF' },
+                  { color: isFocused ? (isDarkMode ? '#818CF8' : '#4F46E5') : (isDarkMode ? '#6B7280' : '#9CA3AF') },
                 ]}
               >
                 {config.label}
@@ -98,11 +102,11 @@ export function BottomTabBar({ state, descriptors, navigation }: BottomTabBarPro
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (isDarkMode: boolean) => StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: isDarkMode ? '#1E293B' : '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: isDarkMode ? '#334155' : '#E5E7EB',
     paddingBottom: Platform.OS === 'ios' ? 20 : 10,
   },
   tabBar: {

@@ -1,10 +1,13 @@
 import { useAuth } from '@/context/auth-context';
+import { useTheme } from '@/context/theme-context';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 
 export function TopBar() {
   const { user } = useAuth();
+  const { isDarkMode } = useTheme();
+  const styles = getStyles(isDarkMode);
 
   const getDisplayName = () => {
     if (user?.firstName && user?.lastName) {
@@ -43,7 +46,7 @@ export function TopBar() {
             />
           ) : (
             <View style={styles.avatarPlaceholder}>
-              <Ionicons name="person" size={20} color="#4F46E5" />
+              <Ionicons name="person" size={20} color={isDarkMode ? '#818CF8' : '#4F46E5'} />
             </View>
           )}
         </View>
@@ -52,11 +55,11 @@ export function TopBar() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (isDarkMode: boolean) => StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: isDarkMode ? '#1E293B' : '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: isDarkMode ? '#334155' : '#E5E7EB',
   },
   content: {
     flexDirection: 'row',
@@ -73,10 +76,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   logoBlue: {
-    color: '#4F46E5',
+    color: isDarkMode ? '#818CF8' : '#4F46E5',
   },
   logoBlack: {
-    color: '#000000',
+    color: isDarkMode ? '#F1F5F9' : '#000000',
   },
   userContainer: {
     flexDirection: 'row',
@@ -86,19 +89,19 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#1F2937',
+    color: isDarkMode ? '#E2E8F0' : '#1F2937',
   },
   avatar: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: isDarkMode ? '#334155' : '#E5E7EB',
   },
   avatarPlaceholder: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#EEF2FF',
+    backgroundColor: isDarkMode ? '#312E81' : '#EEF2FF',
     justifyContent: 'center',
     alignItems: 'center',
   },
