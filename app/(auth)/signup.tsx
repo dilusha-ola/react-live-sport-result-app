@@ -4,15 +4,14 @@ import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 
 export default function SignUpScreen() {
@@ -85,13 +84,14 @@ export default function SignUpScreen() {
 
     setLoading(true);
     try {
+      console.log('Attempting sign up...');
       await signUp(formData);
-      // Navigation will be handled by the root layout based on auth state
+      console.log('Sign up successful, navigating to home...');
+      router.replace('/(tabs)');
+      alert('Account created successfully! Welcome to ScorePulse.');
     } catch (error) {
-      Alert.alert(
-        'Sign Up Failed',
-        error instanceof Error ? error.message : 'An error occurred during sign up'
-      );
+      console.error('Sign up error:', error);
+      alert(error instanceof Error ? error.message : 'An error occurred during sign up');
     } finally {
       setLoading(false);
     }
