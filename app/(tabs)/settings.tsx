@@ -1,16 +1,14 @@
 import { TopBar } from '@/components/navigation/top-bar';
 import { useAuth } from '@/context/auth-context';
-import { useFavorites } from '@/context/favorites-context';
 import { useTheme } from '@/context/theme-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, SafeAreaView, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 
 export default function SettingsScreen() {
   const { logout, user } = useAuth();
-  const { favorites } = useFavorites();
   const { isDarkMode, toggleDarkMode } = useTheme();
   const router = useRouter();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -43,55 +41,21 @@ export default function SettingsScreen() {
     }
   };
 
-  const handleClearCache = () => {
-    Alert.alert(
-      'Clear Cache',
-      'This will clear all cached data. Are you sure?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Clear',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              // Clear specific cache items (not favorites)
-              await AsyncStorage.multiRemove(['@scorepulse_cache', '@scorepulse_settings']);
-              Alert.alert('Success', 'Cache cleared successfully');
-            } catch (error) {
-              Alert.alert('Error', 'Failed to clear cache');
-            }
-          },
-        },
-      ]
-    );
-  };
-
-  const handleClearFavorites = () => {
-    Alert.alert(
-      'Clear All Favorites',
-      `This will remove all ${favorites.length} favorite matches. Are you sure?`,
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Clear',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await AsyncStorage.removeItem('@scorepulse_favorites');
-              Alert.alert('Success', 'All favorites have been cleared');
-            } catch (error) {
-              Alert.alert('Error', 'Failed to clear favorites');
-            }
-          },
-        },
-      ]
-    );
+  const handleClearCache = async () => {
+    const confirmed = window.confirm('This will clear all cached data. Are you sure?');
+    
+    if (!confirmed) {
+      return;
+    }
+    
+    try {
+      // Clear specific cache items (not favorites)
+      await AsyncStorage.multiRemove(['@scorepulse_cache', '@scorepulse_settings']);
+      alert('Cache cleared successfully');
+    } catch (error) {
+      console.error('Cache clear error:', error);
+      alert('Failed to clear cache');
+    }
   };
 
   return (
@@ -172,21 +136,6 @@ export default function SettingsScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Data & Storage</Text>
             
-            <View style={styles.settingItem}>
-              <View style={styles.settingLeft}>
-                <Ionicons name="star-outline" size={24} color={isDarkMode ? '#9CA3AF' : '#6B7280'} />
-                <View style={styles.settingText}>
-                  <Text style={styles.settingLabel}>Favorite Matches</Text>
-                  <Text style={styles.settingValue}>{favorites.length} saved</Text>
-                </View>
-              </View>
-              {favorites.length > 0 && (
-                <TouchableOpacity onPress={handleClearFavorites}>
-                  <Text style={styles.actionText}>Clear</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-
             <TouchableOpacity style={styles.settingItem} onPress={handleClearCache}>
               <View style={styles.settingLeft}>
                 <Ionicons name="trash-outline" size={24} color={isDarkMode ? '#9CA3AF' : '#6B7280'} />
