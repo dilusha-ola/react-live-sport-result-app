@@ -61,13 +61,14 @@ export default function LoginScreen() {
 
     setLoading(true);
     try {
+      console.log('Attempting login...');
       await login(formData);
-      // Navigation will be handled by the root layout based on auth state
+      console.log('Login successful, navigating to home...');
+      router.replace('/(tabs)');
+      alert('Login successful! Welcome back.');
     } catch (error) {
-      Alert.alert(
-        'Login Failed',
-        error instanceof Error ? error.message : 'Invalid username or password'
-      );
+      console.error('Login error:', error);
+      alert(error instanceof Error ? error.message : 'Invalid username or password');
     } finally {
       setLoading(false);
     }
