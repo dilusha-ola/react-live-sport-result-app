@@ -22,24 +22,26 @@ export function LiveMatchCard({ match, onPress, onFavoritePress, isFavorite = fa
       onPress={onPress}
       activeOpacity={0.7}
     >
+      {/* Star icon in top-right corner */}
+      <TouchableOpacity onPress={onFavoritePress} style={styles.favoriteButton}>
+        <Ionicons 
+          name={isFavorite ? 'star' : 'star-outline'} 
+          size={24} 
+          color="#FCD34D" 
+        />
+      </TouchableOpacity>
+
       <View style={styles.cardContent}>
         {/* Left border indicator */}
         <View style={styles.leftBorder} />
 
         {/* Main content */}
         <View style={styles.content}>
-          {/* Live badge and teams */}
+          {/* Live badge */}
           <View style={styles.header}>
             <View style={styles.liveBadge}>
               <Text style={styles.liveText}>LIVE</Text>
             </View>
-            <TouchableOpacity onPress={onFavoritePress} style={styles.favoriteButton}>
-              <Ionicons 
-                name={isFavorite ? 'star' : 'star-outline'} 
-                size={24} 
-                color="#FCD34D" 
-              />
-            </TouchableOpacity>
           </View>
 
           {/* Teams and icon */}
@@ -69,6 +71,7 @@ export function LiveMatchCard({ match, onPress, onFavoritePress, isFavorite = fa
 
 const styles = StyleSheet.create({
   card: {
+    position: 'relative',
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     marginBottom: 12,
@@ -78,6 +81,15 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    zIndex: 10,
+    padding: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 20,
   },
   cardContent: {
     flexDirection: 'row',
@@ -92,7 +104,6 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,
   },
@@ -106,9 +117,6 @@ const styles = StyleSheet.create({
     color: '#EF4444',
     fontSize: 12,
     fontWeight: '700',
-  },
-  favoriteButton: {
-    padding: 4,
   },
   matchInfo: {
     flexDirection: 'row',

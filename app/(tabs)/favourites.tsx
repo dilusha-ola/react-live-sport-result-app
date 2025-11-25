@@ -3,6 +3,7 @@ import { RecentMatchCard } from '@/components/matches/recent-match-card';
 import { UpcomingMatchCard } from '@/components/matches/upcoming-match-card';
 import { TopBar } from '@/components/navigation/top-bar';
 import { useFavorites } from '@/context/favorites-context';
+import { useTheme } from '@/context/theme-context';
 import { Event, MatchStatus } from '@/types/sports';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -27,7 +28,10 @@ const MATCH_TABS: { key: MatchStatus | 'all'; label: string }[] = [
 export default function FavouritesScreen() {
   const router = useRouter();
   const { favorites, toggleFavorite, isFavorite, loading } = useFavorites();
+  const { isDarkMode } = useTheme();
   const [activeTab, setActiveTab] = useState<MatchStatus | 'all'>('all');
+  
+  const styles = getStyles(isDarkMode);
 
   const handleMatchPress = (match: Event) => {
     router.push({
@@ -122,12 +126,12 @@ export default function FavouritesScreen() {
         <View style={styles.content}>
           {loading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#4F46E5" />
+              <ActivityIndicator size="large" color={isDarkMode ? '#818CF8' : '#4F46E5'} />
               <Text style={styles.loadingText}>Loading favorites...</Text>
             </View>
           ) : filteredFavorites.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Ionicons name="star-outline" size={64} color="#D1D5DB" />
+              <Ionicons name="star-outline" size={64} color={isDarkMode ? '#475569' : '#D1D5DB'} />
               <Text style={styles.emptyTitle}>No Favorites Yet</Text>
               <Text style={styles.emptySubtitle}>
                 {activeTab === 'all' 
@@ -154,14 +158,14 @@ export default function FavouritesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (isDarkMode: boolean) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: isDarkMode ? '#1E293B' : '#FFFFFF',
   },
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: isDarkMode ? '#0F172A' : '#F9FAFB',
   },
   content: {
     flex: 1,
@@ -169,9 +173,9 @@ const styles = StyleSheet.create({
   },
   tabsContainer: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: isDarkMode ? '#1E293B' : '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: isDarkMode ? '#334155' : '#E5E7EB',
     paddingHorizontal: 16,
   },
   tab: {
@@ -182,15 +186,15 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   tabActive: {
-    borderBottomColor: '#4F46E5',
+    borderBottomColor: isDarkMode ? '#818CF8' : '#4F46E5',
   },
   tabText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#9CA3AF',
+    color: isDarkMode ? '#64748B' : '#9CA3AF',
   },
   tabTextActive: {
-    color: '#4F46E5',
+    color: isDarkMode ? '#818CF8' : '#4F46E5',
   },
   header: {
     flexDirection: 'row',
@@ -201,12 +205,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#1F2937',
+    color: isDarkMode ? '#F1F5F9' : '#1F2937',
   },
   count: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6B7280',
+    color: isDarkMode ? '#94A3B8' : '#6B7280',
   },
   matchesList: {
     paddingBottom: 20,
@@ -219,7 +223,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#6B7280',
+    color: isDarkMode ? '#94A3B8' : '#6B7280',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -231,12 +235,12 @@ const styles = StyleSheet.create({
     marginTop: 24,
     fontSize: 20,
     fontWeight: '700',
-    color: '#1F2937',
+    color: isDarkMode ? '#F1F5F9' : '#1F2937',
   },
   emptySubtitle: {
     marginTop: 8,
     fontSize: 14,
-    color: '#6B7280',
+    color: isDarkMode ? '#94A3B8' : '#6B7280',
     textAlign: 'center',
     lineHeight: 20,
   },
