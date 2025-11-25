@@ -3,6 +3,7 @@ import { RecentMatchCard } from '@/components/matches/recent-match-card';
 import { UpcomingMatchCard } from '@/components/matches/upcoming-match-card';
 import { TopBar } from '@/components/navigation/top-bar';
 import { useFavorites } from '@/context/favorites-context';
+import { useTheme } from '@/context/theme-context';
 import { MOCK_DATA } from '@/data/mock-matches';
 import { Event, SportCategory } from '@/types/sports';
 import { Ionicons } from '@expo/vector-icons';
@@ -28,8 +29,11 @@ const SPORT_FILTERS = [
 export default function SearchScreen() {
   const router = useRouter();
   const { toggleFavorite, isFavorite } = useFavorites();
+  const { isDarkMode } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSport, setSelectedSport] = useState<'all' | SportCategory>('all');
+  
+  const styles = getStyles(isDarkMode);
 
   // Get all matches from mock data
   const allMatches = useMemo(() => {
@@ -129,11 +133,11 @@ export default function SearchScreen() {
       
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          <Ionicons name="search-outline" size={20} color="#9CA3AF" />
+          <Ionicons name="search-outline" size={20} color={isDarkMode ? '#6B7280' : '#9CA3AF'} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search teams, leagues, matches..."
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={isDarkMode ? '#6B7280' : '#9CA3AF'}
             value={searchQuery}
             onChangeText={setSearchQuery}
             autoCapitalize="none"
@@ -141,7 +145,7 @@ export default function SearchScreen() {
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={20} color="#9CA3AF" />
+              <Ionicons name="close-circle" size={20} color={isDarkMode ? '#6B7280' : '#9CA3AF'} />
             </TouchableOpacity>
           )}
         </View>
@@ -179,7 +183,7 @@ export default function SearchScreen() {
         <View style={styles.content}>
           {searchQuery.trim() === '' && selectedSport === 'all' ? (
             <View style={styles.emptyContainer}>
-              <Ionicons name="search-outline" size={64} color="#D1D5DB" />
+              <Ionicons name="search-outline" size={64} color={isDarkMode ? '#475569' : '#D1D5DB'} />
               <Text style={styles.emptyTitle}>Search for Matches</Text>
               <Text style={styles.emptySubtitle}>
                 Enter team names, leagues, or select a sport to find matches
@@ -187,7 +191,7 @@ export default function SearchScreen() {
             </View>
           ) : filteredMatches.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Ionicons name="alert-circle-outline" size={64} color="#D1D5DB" />
+              <Ionicons name="alert-circle-outline" size={64} color={isDarkMode ? '#475569' : '#D1D5DB'} />
               <Text style={styles.emptyTitle}>No Results Found</Text>
               <Text style={styles.emptySubtitle}>
                 Try adjusting your search or filters
@@ -211,15 +215,15 @@ export default function SearchScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (isDarkMode: boolean) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: isDarkMode ? '#1E293B' : '#FFFFFF',
   },
   searchContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: isDarkMode ? '#1E293B' : '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: isDarkMode ? '#334155' : '#E5E7EB',
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 8,
@@ -227,7 +231,7 @@ const styles = StyleSheet.create({
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: isDarkMode ? '#334155' : '#F9FAFB',
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -237,7 +241,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: '#1F2937',
+    color: isDarkMode ? '#E2E8F0' : '#1F2937',
   },
   filtersContainer: {
     marginBottom: 8,
@@ -249,9 +253,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: isDarkMode ? '#334155' : '#F3F4F6',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: isDarkMode ? '#475569' : '#E5E7EB',
   },
   filterChipActive: {
     backgroundColor: '#4F46E5',
@@ -260,14 +264,14 @@ const styles = StyleSheet.create({
   filterChipText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6B7280',
+    color: isDarkMode ? '#CBD5E1' : '#6B7280',
   },
   filterChipTextActive: {
     color: '#FFFFFF',
   },
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: isDarkMode ? '#0F172A' : '#F9FAFB',
   },
   content: {
     padding: 16,
@@ -278,7 +282,7 @@ const styles = StyleSheet.create({
   resultsCount: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6B7280',
+    color: isDarkMode ? '#94A3B8' : '#6B7280',
   },
   matchesList: {
     paddingBottom: 20,
@@ -293,12 +297,12 @@ const styles = StyleSheet.create({
     marginTop: 24,
     fontSize: 20,
     fontWeight: '700',
-    color: '#1F2937',
+    color: isDarkMode ? '#F1F5F9' : '#1F2937',
   },
   emptySubtitle: {
     marginTop: 8,
     fontSize: 14,
-    color: '#6B7280',
+    color: isDarkMode ? '#94A3B8' : '#6B7280',
     textAlign: 'center',
     lineHeight: 20,
   },
